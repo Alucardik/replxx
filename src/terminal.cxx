@@ -635,7 +635,8 @@ Terminal::EVENT_TYPE Terminal::wait_for_input( int long timeout_ ) {
 		FD_ZERO( &fdSet );
 		FD_SET( 0, &fdSet );
 		FD_SET( _interrupt[0], &fdSet );
-		timeval tv{ timeout_ / 1000, static_cast<suseconds_t>( ( timeout_ % 1000 ) * 1000 ) };
+        // need explicit cast when cross-compiling using Emscripten due to time_t non-std size
+        timeval tv{ static_cast<time_t>(timeout_ / 1000), static_cast<suseconds_t>( ( timeout_ % 1000 ) * 1000 ) };
 		int err( select( nfds, &fdSet, nullptr, nullptr, timeout_ > 0 ? &tv : nullptr ) );
 		if ( ( err == -1 ) && ( errno == EINTR ) ) {
 			continue;
